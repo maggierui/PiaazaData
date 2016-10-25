@@ -1,0 +1,154 @@
+---
+title: "OMSCS_Fall2016_DiscussionForum"
+author: "Rui"
+date: "October 13, 2016"
+output: 
+  html_document: 
+    keep_md: yes
+---
+
+```{r}
+
+library(jsonlite)
+getwd()
+setwd("/Users/ruihu/Documents/DataScience/Joyner_Data")
+usersJson <- fromJSON("users.json") 
+names(usersJson)
+class_contentJson<-fromJSON("class_content.json")
+names(class_contentJson)
+class(class_contentJson)
+changelog<-class_contentJson[['change_log']]
+post_record<-class_contentJson[1,]
+class(post_record[1,1])
+str(post_record[1,1])
+class(children)
+class(changelog[1])
+changelog[1]
+names(changelog[[1]])
+names(changelog[[2]])
+changelog[[1]]
+
+changelog[[7]]
+children<-class_contentJson['children']
+class(children[1,])
+children[1,]
+        
+```
+original data frame of content_json: each row is a post thread record. In this record, recorded each time when there is a new response, follow up, feedback, also recorded each response's author name, content, original post' author name, subject, contents. 
+
+A flatened data structure need to have:
+post thread ID: change_log$data
+original thread subject and content: history$subject history$content
+author of original thread: history$uid
+published time: history$created
+
+```{r,echo=TRUE}
+library(dplyr)
+usersJson <- fromJSON("users.json") 
+names(usersJson)
+class_contentJson<-fromJSON("class_content.json")
+discussion_data<-data.frame(post_id=character(0), author=character(0), subject=character(0), content=character(0), type=character(0), when=character(0),stringsAsFactors=FALSE)
+str(discussion_data)
+discussion_data
+for(i in 1:3){
+  post_record<-class_contentJson[i,]
+  post_record
+  post_log<-post_record$change_log
+  post_log
+  
+  post_replies<-post_record$children
+  post_replies[[1]]
+   post_replies[[1]][[2]]
+ length(post_replies[[1]][[2]])
+  post_id<-post_log[[1]][[1]][[1]]
+  post_id
+  class(post_record$history)
+  author<-post_record$history[[1]][[1]]
+  print(author)
+  subject<-post_record$history[[1]][[4]]
+  print(subject)
+  content<-post_record$history[[1]][[3]]
+  type<-post_record$type
+  print(type)
+  when<-post_log[[1]][[5]][[1]]
+  class(when)
+  c(post_id,author,subject,content,type,when)
+  discussion_data<-rbind(discussion_data,setNames(as.list(c(post_id,author,subject,content,type,when)),names(discussion_data)))
+ discussion_data
+ post_replies[[1]][[2]]
+ length(post_replies[[1]][[2]])
+ length(post_replies[[1]][[2]])
+  for(j in 1:length(post_replies[[1]][[2]])){
+    author<-post_replies[[j]][[8]]
+    content<-post_replies[[j]][[16]]
+    when<-post_replies[[j]][[13]]
+    type<-post_replies[[j]][[7]]
+   discussion_data<-rbind(discussion_data,setNames(as.list(c(post_id,author,subject,content,type,when)),names(discussion_data)))
+   discussion_data
+    for (k in 1:length(post_replies[[1]][[2]][[1]][[2]])){
+      author<-post_replies[[1]][[2]][[1]][[7]][[k]]
+      content<-post_replies[[1]][[2]][[1]][[14]][[k]]
+      when<-post_replies[[1]][[2]][[1]][[11]][[k]]
+      type<-post_replies[[1]][[2]][[1]][[6]][[k]]
+    
+      discussion_data<-rbind(discussion_data,setNames(as.list(c(post_id,author,subject,content,type,when)),names(discussion_data)))
+      
+    }
+  }
+  names(discussion_data)
+  class(discussion_data$post_id)
+  class(discussion_data$author)
+  class(discussion_data$type)
+}
+```
+
+```{r, echo=TRUE}
+test<-do.call(c, unlist(class_contentJson, recursive=FALSE))
+for(i in 1:1216){
+  change_log_Name = paste("change_log", as.character(i), ".data",sep="")
+  post_id<-test$change_log_Name[1]
+  children_uid_Name=paste("children",as.character(i),".uid",sep = "")
+  author<-test$children_uid_Name
+}
+```
+
+subject<-post_record$historysubject // gettting the post subject
+j<-length(children) 
+for j in 1:length(children) // 
+  author<-children$uid
+  content<-children$subject
+  
+  
+children is a list, including whatever amount of 1st level reply; each reply is a list too, including whatever amount of 2nd level reply
+level1_reply<-
+
+
+```
+children posts content: children$subject
+author of children: children$uid
+published time:children$created/updated
+
+For one post thread, the number of change_log should equal to number of children and children's children plus history. 
+change_log$when should match with:
+history$created
+children$created/updated
+children's children$created/updated
+
+
+
+change_log$data: a post thread
+change_log$uid: a behavior to a post: create/follow up/feedback
+change_log$to: unknown, when exists, equals to id in content_json
+
+children$uid is user_id in users.json
+children$id: unknown
+children$subject: content of the post
+
+level 1 children: first level reply
+level 2 children: 2nd level reply
+
+history$uid: is user_id in users.json
+history$content: original post content
+history$subject: original post subject
+
+$unique_views
