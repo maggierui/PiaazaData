@@ -95,8 +95,12 @@ paste("TA2 has", sep = " ", nrow(ta2_post), "posts")
 It will be interesting to see the distribution of posts by time in general (across all users excluding the instructor and TA):
 ```{r,echo=FALSE}
 filtered_discussion$day<-trunc(as.POSIXct(filtered_discussion$when),"day") ##truncate time into dates
-filtered_discussion$day<-as.factor(as.character(filtered_discussion$day))
-ggplot(filtered_discussion, aes(as.factor(day))) + geom_bar(stat="bin")
+filtered_discussion$post<-1
+filtered_discussion$day<-as.Date(as.character(filtered_discussion$day))
+ggplot(data=filtered_discussion,aes(day,post))+stat_summary(fun.y = sum,geom = "bar")+scale_x_date()
+## Also, is there a pattern by weekdays?
+filtered_discussion$weekday<-weekdays(filtered_discussion$day)
+ggplot(data=filtered_discussion,aes(weekday,post))+stat_summary(fun.y = sum,geom = "bar")
 ```
 
 Also, it is necessary to know the total posts for each user (excluding the instructor and TAs) by types: note, followup, and feedback. 
